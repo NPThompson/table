@@ -12,16 +12,6 @@ using namespace std;
 
 
 
-class tableMissingElementException : public exception
-{
-	virtual const char* what() const throw ()
-	{
-		return " no value associated with the key found in the table ";
-	}
-} missingElementException;
-
-
-
 namespace hashf
 {
 	unsigned int constchar(const char* key)
@@ -47,23 +37,41 @@ namespace hashf
 
 template<typename K, typename V, const unsigned int size = 128> class table
 {
+		struct record
+		{
+			record(K k)
+			{
+				key = k;
+				next = nullptr;
+			}
+			
+			K key;
+			V val;
+			record* next;
+		};
+		
+
 	public:
-	
+		table()
+		{
+			for(int i = 0; i < size; i++)
+				records[i] = nullptr;
+		}
+		
 		V& operator[](K key)
 		{
-			// where to find
-			int index = hash(key);
-			
-			// if none found, set new key
-			if(records[index].key != key)
-				records[index].key = key;
-			
-			// return if found
-			return records[index].val;
+			return get(key)->val;
 		}
 		
 		bool contains(K key)
 		{
+			record* r = records[hash(key)];
+			while(r != nullptr)
+			{
+				if(r->key == key)
+					return true;
+				r = r->next;
+			}
 			return false;
 		}
 		
@@ -73,6 +81,37 @@ template<typename K, typename V, const unsigned int size = 128> class table
 		}
 		
 	private:
+		record* get(K key)
+		{
+			// where to find
+			int index = hash(key);
+
+			// if non initialized
+			if(records[index] == nullptr)
+			{	
+				records[index] = new record(key);
+				return records[index];
+			}
+			
+			// if hashes are the same
+			record* bucket = records[index];
+			
+			while(true)
+			{
+				if(bucket->key == key)
+					return bucket;
+				
+				if(bucket->next == nullptr)
+				{
+					bucket->next = new record(key);
+					return bucket->next;
+				}
+				
+				bucket = bucket->next;
+			}
+			
+			return nullptr;
+		}
 		
-		struct { K key; V val; } records[size];
+		record* records[size];
 };
