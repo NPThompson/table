@@ -1,6 +1,7 @@
 // table tests
 #include"table.h"
 #include<stdio.h>
+#include<exception>
 
 
 
@@ -14,7 +15,7 @@ int main(int argc, char** argv)
 		table<const char*, int> mytable;
 		int val = mytable["some-key-value"];
 		printf("TEST #1: Did not throw an exception when attempting to read a non-existent value\n");
-	}catch(int)
+	}catch(exception &e)
 	{
 		// executed correctly
 	}
