@@ -14,15 +14,33 @@ class tableMissingElementException : public exception
 
 
 
-template<typename K, typename V> class table
+namespace hash
+{
+	unsigned int string(const char* key)
+	{
+		unsigned int sum = 0;
+		while(*key != '\0')
+			sum += *(key++);
+		return sum;
+	}
+}
+
+
+
+template<typename K, typename V, const unsigned int size = 128> class table
 {
 	public:
 		V& operator[](K key)
 		{
 			throw missingElementException;
-			return records[0];
+			return records[hash(key)];
+		}
+		
+		unsigned int hash(K key)
+		{
+			return hash::string(key) % size;
 		}
 		
 	private:
-		V records[128];
+		V records[size];
 };
