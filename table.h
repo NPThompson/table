@@ -31,6 +31,14 @@ namespace hashf
 		
 		return sum;
 	}
+
+	// TODO: 
+	// template specializations so that generic reduces to the appropriate hash function
+	template<typename T> unsigned int generic(T key)
+	{
+		return string(key);
+	}	
+	
 };
 
 
@@ -77,7 +85,7 @@ template<typename K, typename V, const unsigned int size = 128> class table
 		
 		unsigned int hash(K key)
 		{
-			return hashf::string(key) % size;
+			return hashf::generic(key) % size;
 		}
 		
 	private:
